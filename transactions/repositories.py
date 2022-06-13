@@ -12,9 +12,9 @@ from .utils import TransactionUtils
 
 
 class TransactionRepository(TransactionRepositoryInterface):
-    def __init__(self, transfer_collection, account_collection):
+    def __init__(self, transaction_collection, account_collection):
         self._account_collection = account_collection
-        self._transfer_collection = transfer_collection
+        self._transaction_collection = transaction_collection
         self.utils = TransactionUtils()
 
     async def _get_account(self, user_id: str, currency: Currency):
@@ -42,7 +42,7 @@ class TransactionRepository(TransactionRepositoryInterface):
             'unix_ts': time(),
             'transaction_datetime': datetime.utcnow()
         }
-        await self._transfer_collection.insert_one(document=document)
+        await self._transaction_collection.insert_one(document=document)
 
     async def _transfer(self, amount: float, sender_id: str, receiver_id: str,
                         transaction_type: TransactionType, currency: Currency, description: Optional[str]):
@@ -98,3 +98,20 @@ class TransactionRepository(TransactionRepositoryInterface):
                 }
                 await self._save_transaction(**transaction_data)
                 return updated_account
+
+    async def exchange_money(self, user_id: str, amount: float,
+                             from_currency: Currency, to_currency: Currency):
+        from_account = await self._get_account(user_id=user_id, currency=from_currency)
+        await self.utils.check_balance(amount=amount, balance=from_account['balance'])
+        to_account = await self._get_account(user_id=user_id, currency=to_currency)
+        async with await client.start_session() as session:
+            async with session.start_transaction():
+                await self._account_collection.update_one(
+                    filter={'_id': from_account['_id'], 'currency': from_currency.value},
+                    update={'$inc': {'balance': -amount}}
+                )
+                # convert to to_currency and save ->
+                await self._account_collection.update_one(
+                    filter={'_id': to_account['_id'], 'currency': to_currency.value},
+                    update={'$inc': {'balance': amount}}
+                )

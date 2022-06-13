@@ -25,6 +25,12 @@ class CreatePhoneTransactionSchema(MoneySchema, DescriptionSchema, BaseModel):
     phone: int
 
 
+class ExchangeSchema(BaseModel):
+    from_currency: Currency
+    to_currency: Currency
+    amount: float
+
+
 class TransactionSchema(BaseModel):
     id: ObjID = Field(alias='_id')
     sender_account_id: str

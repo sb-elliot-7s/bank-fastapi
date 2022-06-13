@@ -6,3 +6,4 @@ class Currency(Enum):
     EUR = 'eur'
     RUB = 'rub'
     UAH = 'uah'
+    JPY = 'jpy'

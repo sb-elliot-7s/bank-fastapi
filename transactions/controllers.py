@@ -1,7 +1,8 @@
 from fastapi import APIRouter, status, Depends
 
+from common_enums import Currency
 from .schemas import MoneySchema
-from .schemas import CreateTransactionSchema, CreatePhoneTransactionSchema
+from .schemas import CreateTransactionSchema, CreatePhoneTransactionSchema, ExchangeSchema
 from .deps import get_transaction_collection
 from permissions import Permission
 from auth.token_service import TokenService
@@ -21,7 +22,7 @@ async def transfer_money(
         account_collection=Depends(get_account_collection),
         user=Depends(Permission(token_service=TokenService()))):
     await TransactionService(repository=TransactionRepository(
-        account_collection=account_collection, transfer_collection=transaction_collection)
+        account_collection=account_collection, transaction_collection=transaction_collection)
     ).transfer_money(sender_id=user.id, transaction_data=transaction_data)
 
 
@@ -32,7 +33,7 @@ async def update_money_to_account(money: MoneySchema,
                                   account_collection=Depends(get_account_collection),
                                   user=Depends(Permission(token_service=TokenService()))):
     return await TransactionService(repository=TransactionRepository(
-        account_collection=account_collection, transfer_collection=transfer_collection)
+        account_collection=account_collection, transaction_collection=transfer_collection)
     ).update_balance_in_account(user_id=user.id, money=money)
 
 
@@ -44,6 +45,20 @@ async def transfer_money_by_phone(
         user_collection=Depends(get_user_collection),
         user=Depends(Permission(token_service=TokenService()))):
     await TransactionService(repository=TransactionRepository(
-        account_collection=account_collection, transfer_collection=transaction_collection)
+        account_collection=account_collection, transaction_collection=transaction_collection)
     ).transfer_money_by_phone(sender_id=user.id, transaction_data=transaction_data,
                               user_collection=user_collection)
+
+
+@finance_router.post('/exchange')
+async def exchange(
+        exchange_data: ExchangeSchema,
+        account_collection=Depends(get_account_collection),
+        user=Depends(Permission(token_service=TokenService())),
+        transaction_collection=Depends(get_transaction_collection),
+):
+    await TransactionService(repository=TransactionRepository(
+        account_collection=account_collection, transaction_collection=transaction_collection
+    )).exchange_money(user_id=user.id, exchange_data=exchange_data)
+
+

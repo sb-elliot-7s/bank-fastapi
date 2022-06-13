@@ -1,5 +1,6 @@
+from common_enums import Currency
 from .schemas import MoneySchema
-from .schemas import CreateTransactionSchema, CreatePhoneTransactionSchema
+from .schemas import CreateTransactionSchema, CreatePhoneTransactionSchema, ExchangeSchema
 from .interfaces.repository_interface import TransactionRepositoryInterface
 
 
@@ -19,3 +20,6 @@ class TransactionService:
         return await self._repository \
             .transfer_money_by_phone(user_collection=user_collection, sender_id=sender_id,
                                      **transaction_data.dict())
+
+    async def exchange_money(self, user_id: str, exchange_data: ExchangeSchema):
+        return await self._repository.exchange_money(user_id=user_id, **exchange_data.dict())

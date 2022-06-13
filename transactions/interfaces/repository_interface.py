@@ -23,3 +23,7 @@ class TransactionRepositoryInterface(ABC):
                                       currency: Currency, description: Optional[str],
                                       transaction_type: TransactionType):
         pass
+
+    @abstractmethod
+    async def exchange_money(self, user_id: str, amount: float,
+                             from_currency: Currency, to_currency: Currency): pass
