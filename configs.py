@@ -8,6 +8,14 @@ class Configs(BaseSettings):
 
     api_key: str
 
+    yandex_mail: str
+    yandex_password: str
+    yandex_hostname: str
+    yandex_port: int
+
+    key_for_pyotp: str
+    tfa_interval: int
+
     class Config:
         env_file = '.env'
         env_file_encoding = 'utf-8'

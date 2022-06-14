@@ -16,8 +16,8 @@ class TokenService(TokenServiceInterface):
                                 detail='Not validate credentials')
         return payload
 
-    async def create_token(self, data: dict) -> str:
+    async def create_token(self, data: dict, exp_time: int) -> str:
         payload = data.copy()
-        expire_time = datetime.utcnow() + timedelta(minutes=self.exp_time)
+        expire_time = datetime.utcnow() + timedelta(minutes=exp_time)
         payload.update({'iat': time.time(), 'exp': expire_time})
         return jwt.encode(claims=payload, key=self.secret_key, algorithm=self.algorithm)
