@@ -14,7 +14,7 @@ async def start_work():
     print('start work')
 
 
-@app.timer(interval=600)  # 10min
+@app.timer(interval=10)  # 10min
 async def execute():
     parser = CurrencyParserService()
     documents = await parser.parse_currency()

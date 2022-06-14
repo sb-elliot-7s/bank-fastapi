@@ -21,3 +21,16 @@ class CurrencyResponseSchema(BaseModel):
         json_encoders = {
             datetime: lambda x: x.strftime('%Y-%d-%m %H:%M:%S')
         }
+
+
+class ExchangeCurrencySchema(BaseModel):
+    from_currency: str
+    to_currency: str
+    exchange_rate: str
+
+    @classmethod
+    def from_raw_object(cls, object: dict):
+        from_currency = object.get('1. From_Currency Code')
+        to_currency = object.get('3. To_Currency Code')
+        exchange_rate = object.get('5. Exchange Rate')
+        return cls(from_currency=from_currency, to_currency=to_currency, exchange_rate=exchange_rate)

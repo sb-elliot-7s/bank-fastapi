@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from common_enums import Currency
+from .commission_interfaces import CalculateCommissionInterface
 from ..constants import TransactionType
 from account.schemas import AccountSchema
 
@@ -25,5 +26,5 @@ class TransactionRepositoryInterface(ABC):
         pass
 
     @abstractmethod
-    async def exchange_money(self, user_id: str, amount: float,
-                             from_currency: Currency, to_currency: Currency): pass
+    async def exchange_money(self, user_id: str, amount: float, from_currency: Currency,
+                             to_currency: Currency, commission_service: CalculateCommissionInterface): pass

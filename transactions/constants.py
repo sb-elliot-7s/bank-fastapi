@@ -6,3 +6,4 @@ class TransactionType(Enum):
     PHONE = 'phone'
     DEPOSIT = 'deposit'
     WITHDRAW = 'withdraw'
+    EXCHANGE = 'exchange'

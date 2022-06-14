@@ -1,6 +1,7 @@
 from .schemas import MoneySchema
 from .schemas import CreateTransactionSchema, CreatePhoneTransactionSchema, ExchangeSchema
 from .interfaces.repository_interface import TransactionRepositoryInterface
+from .interfaces.commission_interfaces import CalculateCommissionInterface
 
 
 class TransactionService:
@@ -20,5 +21,7 @@ class TransactionService:
             .transfer_money_by_phone(user_collection=user_collection, sender_id=sender_id,
                                      **transaction_data.dict())
 
-    async def exchange_money(self, user_id: str, exchange_data: ExchangeSchema):
-        return await self._repository.exchange_money(user_id=user_id, **exchange_data.dict())
+    async def exchange_money(self, user_id: str, exchange_data: ExchangeSchema,
+                             commission_service: CalculateCommissionInterface):
+        return await self._repository.exchange_money(commission_service=commission_service, user_id=user_id,
+                                                     **exchange_data.dict())

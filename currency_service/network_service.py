@@ -1,10 +1,21 @@
 import datetime
+import json
 
 import aiohttp
 from bs4 import BeautifulSoup
+from configs import get_configs
+from .schemas import ExchangeCurrencySchema
 
 
-class CurrencyParserService:
+class NetworkService:
+    @staticmethod
+    async def fetch(url: str, headers: dict = None, params: dict = None):
+        async with aiohttp.ClientSession(trust_env=True) as session:
+            async with session.get(url=url, headers=headers, params=params) as response:
+                return await response.text()
+
+
+class CurrencyParserService(NetworkService):
     HEADERS = {
         "User-Agent": "Mozilla/5.0 (Linux; U; Android 4.2.2; he-il; NEO-X5-116A Build/JDQ39) "
                       "AppleWebKit/534.30 ("
@@ -12,13 +23,8 @@ class CurrencyParserService:
     }
     URL = 'https://ru.investing.com/currencies/streaming-forex-rates-majors'
 
-    async def _fetch(self, url: str):
-        async with aiohttp.ClientSession(trust_env=True) as session:
-            async with session.get(url=url, headers=self.HEADERS) as response:
-                return await response.text()
-
     async def parse_currency(self):
-        text = await self._fetch(url=self.URL)
+        text = await self.fetch(url=self.URL, headers=self.HEADERS)
         soup = BeautifulSoup(text, 'html.parser')
         base = soup.find('table', class_='genTbl')
         currencies = base.find('tbody').find_all('tr')
@@ -38,5 +44,17 @@ class CurrencyParserService:
             documents.append(document)
         return {'created': datetime.datetime.now(), 'values': documents}
 
-    async def exchange_money(self):
-        await self._fetch(url='')
+
+class CurrencyExchangeService(NetworkService):
+    EXCHANGE_URL = 'https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&'
+
+    async def exchange_rate(self, from_currency: str, to_currency: str):
+        result = await self.fetch(url=self.EXCHANGE_URL, params={
+            'from_currency': from_currency,
+            'to_currency': to_currency,
+            'apikey': get_configs().api_key
+        })
+        object = json.loads(result).get('Realtime Currency Exchange Rate')
+        a = ExchangeCurrencySchema.from_raw_object(object=object)
+        print(a)
+        return a

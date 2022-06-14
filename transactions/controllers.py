@@ -10,6 +10,9 @@ from account.deps import get_account_collection
 from account.schemas import AccountSchema
 from auth.deps import get_user_collection
 
+from .commission_services import WithoutCommission, Commission
+from currency_service.network_service import CurrencyExchangeService
+
 finance_router = APIRouter(prefix='/transactions', tags=['transactions'])
 
 
@@ -57,4 +60,7 @@ async def exchange(
 ):
     await TransactionService(repository=TransactionRepository(
         account_collection=account_collection, transaction_collection=transaction_collection
-    )).exchange_money(user_id=user.id, exchange_data=exchange_data)
+    )).exchange_money(
+        user_id=user.id,
+        exchange_data=exchange_data,
+        commission_service=Commission(commision=10, currency_exchange_service=CurrencyExchangeService()))
