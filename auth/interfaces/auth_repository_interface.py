@@ -5,7 +5,7 @@ from ..constants import Gender
 
 class AuthRepositoriesInterface(ABC):
     @abstractmethod
-    async def save_user(self, first_name: str, last_name: str, password: str, email: str,
+    async def save_user(self, first_name: str, last_name: str, password: str, email: str, phone: int,
                         username: Optional[str], gender: Gender) -> None:
         pass
 

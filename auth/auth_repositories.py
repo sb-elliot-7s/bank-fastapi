@@ -11,7 +11,7 @@ class AuthUserRepository(AuthRepositoriesInterface):
     def __init__(self, collection):
         self._collection = collection
 
-    async def save_user(self, first_name: str, last_name: str, password: str, email: str,
+    async def save_user(self, first_name: str, last_name: str, password: str, email: str, phone: int,
                         username: Optional[str], gender: Gender) -> None:
         slug = create_slug(text=username or str(uuid4()))
         document = {
@@ -19,6 +19,7 @@ class AuthUserRepository(AuthRepositoriesInterface):
             'last_name': last_name,
             'password': password,
             'email': email,
+            'phone': phone,
             'username': username,
             'gender': gender.value,
             'unix_ts': time(),

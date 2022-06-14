@@ -12,6 +12,7 @@ class BaseUserSchema(BaseModel):
     email: EmailStr
     gender: Gender
     username: Optional[str]
+    phone: Optional[int]
 
 
 class CreateUserSchema(BaseUserSchema):
