@@ -7,3 +7,8 @@ class TransactionType(Enum):
     DEPOSIT = 'deposit'
     WITHDRAW = 'withdraw'
     EXCHANGE = 'exchange'
+
+
+class CommissionType(Enum):
+    WITHOUT_COMMISSIOn = 'without_commission'
+    WITH_COMMISSION = 'with_commission'

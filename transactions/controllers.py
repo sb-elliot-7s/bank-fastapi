@@ -9,7 +9,7 @@ from .repositories import TransactionRepository
 from account.deps import get_account_collection
 from account.schemas import AccountSchema
 from auth.deps import get_user_collection
-
+from .constants import CommissionType
 from .commission_services import WithoutCommission, Commission
 from currency_service.network_service import CurrencyExchangeService
 
@@ -51,9 +51,17 @@ async def transfer_money_by_phone(
                               user_collection=user_collection)
 
 
+COMMISSION_RATE = 50
+
+commission_data = {
+    CommissionType.WITHOUT_COMMISSIOn: WithoutCommission(currency_exchange_service=CurrencyExchangeService()),
+    CommissionType.WITH_COMMISSION: Commission(currency_exchange_service=CurrencyExchangeService(),
+                                               commission=COMMISSION_RATE)
+}
+
+
 @finance_router.post('/exchange')
-async def exchange(
-        exchange_data: ExchangeSchema,
+async def exchange(exchange_data: ExchangeSchema,
         account_collection=Depends(get_account_collection),
         user=Depends(Permission(token_service=TokenService())),
         transaction_collection=Depends(get_transaction_collection),
@@ -63,4 +71,4 @@ async def exchange(
     )).exchange_money(
         user_id=user.id,
         exchange_data=exchange_data,
-        commission_service=Commission(commision=10, currency_exchange_service=CurrencyExchangeService()))
+        commission_service=commission_data.get(CommissionType.WITHOUT_COMMISSIOn))

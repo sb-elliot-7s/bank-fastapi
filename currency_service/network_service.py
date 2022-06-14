@@ -55,6 +55,4 @@ class CurrencyExchangeService(NetworkService):
             'apikey': get_configs().api_key
         })
         object = json.loads(result).get('Realtime Currency Exchange Rate')
-        a = ExchangeCurrencySchema.from_raw_object(object=object)
-        print(a)
-        return a
+        return ExchangeCurrencySchema.from_raw_object(object=object)
