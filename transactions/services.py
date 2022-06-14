@@ -1,4 +1,3 @@
-from common_enums import Currency
 from .schemas import MoneySchema
 from .schemas import CreateTransactionSchema, CreatePhoneTransactionSchema, ExchangeSchema
 from .interfaces.repository_interface import TransactionRepositoryInterface

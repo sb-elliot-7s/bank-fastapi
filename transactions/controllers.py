@@ -1,6 +1,4 @@
 from fastapi import APIRouter, status, Depends
-
-from common_enums import Currency
 from .schemas import MoneySchema
 from .schemas import CreateTransactionSchema, CreatePhoneTransactionSchema, ExchangeSchema
 from .deps import get_transaction_collection
@@ -60,5 +58,3 @@ async def exchange(
     await TransactionService(repository=TransactionRepository(
         account_collection=account_collection, transaction_collection=transaction_collection
     )).exchange_money(user_id=user.id, exchange_data=exchange_data)
-
-
