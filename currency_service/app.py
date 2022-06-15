@@ -3,6 +3,7 @@ import faust
 from .network_service import CurrencyParserService
 from .repositories import CurrencyRepositories
 from .deps import currency_collection
+from .cache_service import CacheService
 
 app = faust.App('currency_parser', broker='kafka://localhost:9092')
 
@@ -14,10 +15,10 @@ async def start_work():
     print('start work')
 
 
-@app.timer(interval=10)  # 10min
+@app.timer(interval=600)  # 10min
 async def execute():
     parser = CurrencyParserService()
     documents = await parser.parse_currency()
     if documents:
-        await CurrencyRepositories(currency_collection=currency_collection) \
+        await CurrencyRepositories(currency_collection=currency_collection, cache_service=CacheService()) \
             .save_currencies_to_db(documents=documents)

@@ -29,8 +29,12 @@ class ExchangeCurrencySchema(BaseModel):
     exchange_rate: str
 
     @classmethod
-    def from_raw_object(cls, object: dict):
-        from_currency = object.get('1. From_Currency Code')
-        to_currency = object.get('3. To_Currency Code')
-        exchange_rate = object.get('5. Exchange Rate')
+    def from_raw_object(cls, data: dict):
+        from_currency = data.get('1. From_Currency Code')
+        to_currency = data.get('3. To_Currency Code')
+        exchange_rate = data.get('5. Exchange Rate')
         return cls(from_currency=from_currency, to_currency=to_currency, exchange_rate=exchange_rate)
+
+
+class ExchangedResponseSchema(ExchangeCurrencySchema):
+    result: float

@@ -15,6 +15,5 @@ class Permission:
                        token: str = Depends(OAUTH2_SCHEME)):
         payload = await self._token_service.decode_token(token=token)
         if not (email := payload.get('sub')):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail='User not found')
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User not found')
         return User(**await user_collection.find_one(filter={'email': email}))

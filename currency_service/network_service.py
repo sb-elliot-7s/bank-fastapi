@@ -4,6 +4,7 @@ import json
 import aiohttp
 from bs4 import BeautifulSoup
 from configs import get_configs
+from .interfaces.cache_service_interface import CacheServiceInterface
 from .schemas import ExchangeCurrencySchema
 
 
@@ -48,11 +49,35 @@ class CurrencyParserService(NetworkService):
 class CurrencyExchangeService(NetworkService):
     EXCHANGE_URL = 'https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&'
 
+    def __init__(self, cache_service: CacheServiceInterface):
+        self._cache_service = cache_service
+
     async def exchange_rate(self, from_currency: str, to_currency: str):
+        cache = await self._cache_service.get_from_cache(key=f'exchange:{from_currency}/{to_currency}')
+
+        if cache is not None:
+            return ExchangeCurrencySchema(**json.loads(cache))
         result = await self.fetch(url=self.EXCHANGE_URL, params={
             'from_currency': from_currency,
             'to_currency': to_currency,
             'apikey': get_configs().api_key
         })
-        object = json.loads(result).get('Realtime Currency Exchange Rate')
-        return ExchangeCurrencySchema.from_raw_object(object=object)
+        if "Realtime Currency Exchange Rate" not in result:
+            return False
+        if from_currency == to_currency:
+            return False
+        obj = json.loads(result).get('Realtime Currency Exchange Rate')
+        currency_object = ExchangeCurrencySchema.from_raw_object(data=obj)
+        await self._cache_service.set_to_cache(key=f'exchange:{from_currency}/{to_currency}',
+                                               value=currency_object.json(), exp_time=300)
+        return currency_object
+
+
+class GetExchangeService(CurrencyExchangeService):
+    async def get_exchange(self, from_currency: str, to_currency: str, amount: float):
+        if not (rate := await super().exchange_rate(from_currency=from_currency, to_currency=to_currency)):
+            return False
+        return {
+            'from_currency': from_currency, 'to_currency': to_currency, 'exchange_rate': rate.exchange_rate,
+            'result': amount * float(rate.exchange_rate)
+        }

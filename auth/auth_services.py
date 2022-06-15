@@ -39,13 +39,14 @@ class AuthUserService:
     async def login(self, email: str, password: str, context: PushService) -> dict:
         user = await self._authenticate(email=email, password=password)
         code = self.tfa_service.generate_code()
-        temporary_token = await self._token_service.create_token(data={'sub': user['email']}, exp_time=3)
+        temporary_token = await self._token_service \
+            .create_token(data={'sub': user['email']}, exp_time=get_configs().temporary_token_exp_time)
         await context.send(to_client=user['email'], message=code)
         return {'token': temporary_token}
 
     async def verify_code(self, code: str, user):
         if not self.tfa_service.verify_code(code=code):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Code not valid')
-        token = await self._token_service.create_token(data={'sub': user.email},
-                                                       exp_time=get_configs().exp_time)
+        token = await self._token_service \
+            .create_token(data={'sub': user.email}, exp_time=get_configs().exp_time)
         return {'token': token}

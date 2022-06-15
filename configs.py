@@ -4,6 +4,7 @@ from pydantic import BaseSettings
 class Configs(BaseSettings):
     secret_key: str
     exp_time: int
+    temporary_token_exp_time: int
     algorithm: str
 
     api_key: str
