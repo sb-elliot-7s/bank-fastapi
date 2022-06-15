@@ -4,7 +4,16 @@ from currency_service.network_service import CurrencyExchangeService
 from fastapi import HTTPException, status
 
 
-class CalculateCommissionInterface(ABC):
+class CommissionInterface(ABC):
+    @abstractmethod
+    async def calculate(self, from_currency: str, to_currency: str, amount: float):
+        pass
+
+    @property
+    def percent(self): return 0.0
+
+
+class CalculateCommissionInterface(CommissionInterface):
 
     def __init__(self, currency_exchange_service: CurrencyExchangeService):
         self.currency_exchange_service = currency_exchange_service
@@ -20,6 +29,3 @@ class CalculateCommissionInterface(ABC):
     @abstractmethod
     async def calculate(self, from_currency: str, to_currency: str, amount: float):
         pass
-
-    @property
-    def percent(self): return 0.0

@@ -78,6 +78,6 @@ class GetExchangeService(CurrencyExchangeService):
         if not (rate := await super().exchange_rate(from_currency=from_currency, to_currency=to_currency)):
             return False
         return {
-            'from_currency': from_currency, 'to_currency': to_currency, 'exchange_rate': rate.exchange_rate,
-            'result': amount * float(rate.exchange_rate)
+            'from_currency': from_currency, 'to_currency': to_currency,
+            'exchange_rate': rate.exchange_rate, 'result': amount * float(rate.exchange_rate)
         }

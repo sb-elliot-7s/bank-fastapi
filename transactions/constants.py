@@ -10,5 +10,6 @@ class TransactionType(Enum):
 
 
 class CommissionType(Enum):
-    WITHOUT_COMMISSIOn = 'without_commission'
-    WITH_COMMISSION = 'with_commission'
+    WITHOUT_COMMISSION = 'without_commission'
+    EXCHANGE_COMMISSION = 'exchange_commission'
+    TRANSFER_COMMISSION = 'transfer_commission'

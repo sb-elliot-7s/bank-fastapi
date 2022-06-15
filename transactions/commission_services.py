@@ -1,5 +1,5 @@
 from currency_service.network_service import CurrencyExchangeService
-from .interfaces.commission_interfaces import CalculateCommissionInterface
+from .interfaces.commission_interfaces import CalculateCommissionInterface, CommissionInterface
 
 
 class WithoutCommission(CalculateCommissionInterface):
@@ -11,7 +11,7 @@ class WithoutCommission(CalculateCommissionInterface):
     def percent(self): return f'{0.0}%'
 
 
-class Commission(CalculateCommissionInterface):
+class ExchangeCommission(CalculateCommissionInterface):
 
     def __init__(self, commission: float, currency_exchange_service: CurrencyExchangeService):
         self._commission = commission
@@ -22,6 +22,19 @@ class Commission(CalculateCommissionInterface):
         fix = result * self._commission / 100
         # transfer fix money to bank account
         return round(result - fix, 2)
+
+    @property
+    def percent(self): return str(self._commission) + '%'
+
+
+class TransferCommission(CommissionInterface):
+    def __init__(self, commission: float):
+        self._commission = commission
+
+    async def calculate(self, from_currency: str, to_currency: str, amount: float):
+        fix = amount * self._commission / 100
+        # transfer fix money to bank account
+        return round(amount - fix, 2)
 
     @property
     def percent(self): return str(self._commission) + '%'
