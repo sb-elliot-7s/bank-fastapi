@@ -1,6 +1,5 @@
 import aiosmtplib
 from email.message import EmailMessage
-
 from .interfaces.push_service import PushService
 
 
@@ -8,11 +7,8 @@ class EmailPushService(PushService):
 
     def __init__(self, host: str, port: int, username: str, password: str):
         self._username = username
-        self.aiosmtplib_object = aiosmtplib.SMTP(hostname=host,
-                                                 port=port,
-                                                 username=username,
-                                                 password=password,
-                                                 use_tls=True)
+        self.aiosmtplib_object = aiosmtplib.SMTP(hostname=host, port=port, username=username,
+                                                 password=password, use_tls=True)
 
     async def send(self, to_client: str, message: str) -> None:
         await self.aiosmtplib_object.connect()

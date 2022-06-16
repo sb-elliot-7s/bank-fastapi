@@ -11,6 +11,5 @@ class ProfileRepository(ProfileRepositoryInterface):
         user = await self._user_collection.find_one_and_update(
             filter={'_id': ObjectId(user_id)},
             update={'$set': updated_data},
-            return_document=True
-        )
+            return_document=True)
         return user

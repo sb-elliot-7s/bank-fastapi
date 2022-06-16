@@ -1,5 +1,4 @@
 import time
-
 from .interfaces.token_service_interface import TokenServiceInterface
 from jose import JWTError, jwt
 from datetime import timedelta, datetime
@@ -12,8 +11,7 @@ class TokenService(TokenServiceInterface):
         try:
             payload = jwt.decode(token=token, key=self.secret_key, algorithms=self.algorithm)
         except JWTError:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                                detail='Not validate credentials')
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Not validate credentials')
         return payload
 
     async def create_token(self, data: dict, exp_time: int) -> str:

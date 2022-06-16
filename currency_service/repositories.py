@@ -16,9 +16,10 @@ class CurrencyRepositories(CurrencyRepositoryInterface):
     async def get_currencies(self, count: int):
         cache = await self._cache_service.get_from_cache(key='currency')
         if cache is None:
-            currencies_raw = await self._currency_collection.find({}, sort=[('created', -1)]) \
+            currencies_raw = await self._currency_collection. \
+                find({}, sort=[('created', -1)]) \
                 .to_list(length=count)
-            currencies = [CurrencyResponseSchema(**a).dict() for a in currencies_raw]
+            currencies = [CurrencyResponseSchema(**currency).dict() for currency in currencies_raw]
             await self._cache_service.set_to_cache(key='currency',
                                                    value=json.dumps(currencies, sort_keys=True, default=str),
                                                    exp_time=600)
