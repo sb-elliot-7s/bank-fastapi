@@ -48,6 +48,7 @@ class TransactionSchema(BaseModel):
     amount_to_receiver_account: Optional[float]
     to_currency: Optional[Currency]
     commission: Optional[str]
+    discount: Optional[float]
 
     class Config:
         json_encoders = {

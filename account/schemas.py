@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from custom_objid import ObjID
 from datetime import datetime
 from common_enums import Currency
+from .account_types import AccountType
 
 
 class CurrencySchema(BaseModel):
@@ -12,6 +13,7 @@ class CurrencySchema(BaseModel):
 
 class CreateAccountSchema(CurrencySchema, BaseModel):
     balance: Optional[float]
+    account_type: AccountType
 
 
 class AccountSchema(CreateAccountSchema):

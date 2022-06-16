@@ -1,17 +1,15 @@
 from abc import ABC, abstractmethod
 from typing import Optional
-
+from ..account_types import AccountType
 from ..schemas import AccountSchema
-
 from common_enums import Currency
 
 
 class AccountRepositoryInterface(ABC):
 
     @abstractmethod
-    async def open_account(self, *, balance: Optional[float] = None,
-                           currency: Currency,
-                           user_id: str) -> Optional[AccountSchema]:
+    async def open_account(self, *, balance: Optional[float] = None, currency: Currency,
+                           account_type: AccountType, user_id: str) -> Optional[AccountSchema]:
         pass
 
     @abstractmethod
@@ -23,6 +21,5 @@ class AccountRepositoryInterface(ABC):
         pass
 
     @abstractmethod
-    async def get_all_accounts(self, user_id: str,
-                               limit: int = 10) -> list[AccountSchema]:
+    async def get_all_accounts(self, user_id: str, limit: int = 10) -> list[AccountSchema]:
         pass

@@ -9,6 +9,7 @@ from utils import create_slug
 from .interfaces.repository_interface import AccountRepositoryInterface
 from .schemas import AccountSchema
 from common_enums import Currency
+from .account_types import AccountType
 
 
 class AccountRepository(AccountRepositoryInterface):
@@ -18,24 +19,22 @@ class AccountRepository(AccountRepositoryInterface):
     async def _get_account_by(self, account_id: str, user_id: str):
         if not (account := await self._account_collection
                 .find_one(filter={'_id': ObjectId(account_id), 'user_id': user_id})):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail='Account not found')
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Account not found')
         return account
 
-    async def open_account(self, *, balance: Optional[float] = None,
-                           currency: Currency,
-                           user_id: str) -> Optional[AccountSchema]:
+    async def open_account(self, *, balance: Optional[float] = None, currency: Currency,
+                           account_type: AccountType, user_id: str) -> Optional[AccountSchema]:
         slug = create_slug(text=str(uuid4()))
         document = {
             'balance': balance or 0.0,
             'currency': currency.value,
+            'account_type': account_type.value,
             'user_id': user_id,
             'slug': slug,
             'date_opened': datetime.now()
         }
         result = await self._account_collection.insert_one(document=document)
-        if not (account := await self._get_account_by(account_id=result.inserted_id,
-                                                      user_id=user_id)):
+        if not (account := await self._get_account_by(account_id=result.inserted_id, user_id=user_id)):
             return None
         return account
 

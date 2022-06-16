@@ -18,7 +18,7 @@ class TransactionData:
     @staticmethod
     async def get_common_data(amount: float, amount_to_receiver_account: float, description: Optional[str],
                               currency: Currency, transaction_type: TransactionType, sender_account: dict,
-                              receiver_account: dict, commission: float, ):
+                              receiver_account: dict, commission: float, discount: float):
         return {
             'amount': amount,
             'amount_to_receiver_account': amount_to_receiver_account,
@@ -28,6 +28,7 @@ class TransactionData:
             'sender_account_id': str(sender_account['_id']),
             'receiver_account_id': str(receiver_account['_id']),
             'commission': commission,
+            'discount': discount
         }
 
     @staticmethod
@@ -76,11 +77,11 @@ class TransactionData:
     async def get_transfer_data(self, amount: float, currency: Currency, desc: Optional[str],
                                 sender_account: dict, receiver_account: dict, to_currency: Currency,
                                 amount_to_receiver_account: float, transaction_type: TransactionType,
-                                commission: float):
+                                commission: float, discount: float):
         data = await self.get_common_data(
             amount=-amount, amount_to_receiver_account=amount_to_receiver_account, currency=currency,
             description=desc, transaction_type=transaction_type, sender_account=sender_account,
-            receiver_account=receiver_account, commission=commission)
+            receiver_account=receiver_account, commission=commission, discount=discount)
         other_data = await self.other_common_data(currency=currency, to_currency=to_currency,
                                                   sender_account=sender_account,
                                                   receiver_account=receiver_account, amount=amount,

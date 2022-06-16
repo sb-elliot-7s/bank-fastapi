@@ -1,10 +1,12 @@
 from currency_service.network_service import CurrencyExchangeService
 from .interfaces.commission_interfaces import CalculateCommissionInterface, CommissionInterface
+from account.account_types import AccountType
 
 
 class WithoutCommission(CalculateCommissionInterface):
 
-    async def calculate(self, from_currency: str, to_currency: str, amount: float):
+    async def calculate(self, amount: float, account_type: AccountType,
+                        from_currency: str = None, to_currency: str = None):
         return await self.pre_calculate(from_currency=from_currency, to_currency=to_currency, amount=amount)
 
     @property
@@ -17,9 +19,10 @@ class ExchangeCommission(CalculateCommissionInterface):
         self._commission = commission
         super().__init__(currency_exchange_service=currency_exchange_service)
 
-    async def calculate(self, from_currency: str, to_currency: str, amount: float):
+    async def calculate(self, amount: float, account_type: AccountType,
+                        from_currency: str = None, to_currency: str = None):
         result = await self.pre_calculate(from_currency=from_currency, to_currency=to_currency, amount=amount)
-        fix = result * self._commission / 100
+        fix = result * (self._commission / 100 * account_type.discount)
         # transfer fix money to bank account
         return round(result - fix, 2)
 
@@ -31,8 +34,9 @@ class TransferCommission(CommissionInterface):
     def __init__(self, commission: float):
         self._commission = commission
 
-    async def calculate(self, from_currency: str, to_currency: str, amount: float):
-        fix = amount * self._commission / 100
+    async def calculate(self, amount: float, account_type: AccountType,
+                        from_currency: str = None, to_currency: str = None):
+        fix = amount * (self._commission / 100 * account_type.discount)
         # transfer fix money to bank account
         return round(amount - fix, 2)
 
