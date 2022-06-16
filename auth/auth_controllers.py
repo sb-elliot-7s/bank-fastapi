@@ -28,7 +28,7 @@ async def registration(user_data: CreateUserSchema, values=Depends(get_auth_serv
 @auth_router.post('/login', **response_data.get('login_and_confirm_code'))
 async def login(email: str = Form(...), password: str = Form(...), values=Depends(get_auth_service)):
     return await AuthUserService(**values) \
-        .login(email=email, password=password, context=EmailPushService(**email_service_data))
+        .login(email=email, password=password)
 
 
 @auth_router.post('/confirm', **response_data.get('login_and_confirm_code'))

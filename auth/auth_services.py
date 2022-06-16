@@ -1,3 +1,4 @@
+import json
 from .interfaces.auth_repository_interface import AuthRepositoriesInterface
 from .schemas import CreateUserSchema
 from .interfaces.password_service_interface import PasswordServiceInterface
@@ -5,7 +6,7 @@ from fastapi import HTTPException, status
 from .interfaces.token_service_interface import TokenServiceInterface
 from .interfaces.tfa_interface import TFAInterface
 from configs import get_configs
-from .interfaces.push_service import PushService
+from .app import push_service_topic
 
 
 class AuthUserService:
@@ -32,12 +33,12 @@ class AuthUserService:
             get_hashed_password(password=user_data.password)
         await self._repository.save_user(password=hash_password, **user_data.dict(exclude={'password'}))
 
-    async def login(self, email: str, password: str, context: PushService) -> dict:
+    async def login(self, email: str, password: str) -> dict:
         user = await self._authenticate(email=email, password=password)
         code = self.tfa_service.generate_code()
         temporary_token = await self._token_service \
             .create_token(data={'sub': user['email']}, exp_time=get_configs().temporary_token_exp_time)
-        await context.send(to_client=user['email'], message=code)
+        await push_service_topic.send(value=json.dumps({'email': user['email'], 'code': code}).encode())
         return {'token': temporary_token}
 
     async def verify_code(self, code: str, user):
